@@ -3,6 +3,20 @@ body {
     margin: 0;
     padding: 0;
     background-color: #f0f0f0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.content-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    height: 80%;
+    width: 100%;
 }
 
 .header {
@@ -10,9 +24,33 @@ body {
     color: #fff;
     padding: 10px 0;
     text-align: center;
+    width: 100%;
 }
 
 .title {
     font-family: 'Chalkduster', 'Comic Sans MS', cursive;
     font-size: 3em;
+}
+
+#sphere-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 30%;
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(5, 1fr);
+    gap: 10px;
+    width: 50%;
+    height: auto;
+}
+
+.grid-container > div {
+    background-color: #ccc;
+    border: 1px solid #999;
+    padding-bottom: 10%;
 }
