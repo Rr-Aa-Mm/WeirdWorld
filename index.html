@@ -30,11 +30,6 @@
         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
       }
 
-      @font-face {
-        font-family: 'Halloween Font';
-        src: url('fonts/halloween-font.ttf');
-      }
-
       @media (max-width: 768px) {
         /* Mobile Styles */
         #canvas {
@@ -44,9 +39,9 @@
       }
     </style>
     <link
-        href="https://fonts.googleapis.com/css2?family=Nosifer&display=swap"
-        rel="stylesheet"
-      >
+      href="https://fonts.googleapis.com/css2?family=Nosifer&display=swap"
+      rel="stylesheet"
+    >
   </head>
   <body>
     <div id="title">Weird World</div>
@@ -129,9 +124,56 @@
         isRotating = false;
       }
 
+      function handleTouchMove(event) {
+        var touch = event.touches[0];
+
+        var deltaMove = {
+          x: touch.clientX - previousMousePosition.x,
+          y: touch.clientY - previousMousePosition.y,
+        };
+
+        if (isRotating) {
+          var rotationQuaternion = new THREE.Quaternion().setFromEuler(
+            new THREE.Euler(
+              toRadians(deltaMove.y),
+              toRadians(deltaMove.x),
+              0,
+              "XYZ"
+            )
+          );
+          sphere.quaternion.multiplyQuaternions(
+            rotationQuaternion,
+            sphere.quaternion
+          );
+        }
+
+        previousMousePosition = {
+          x: touch.clientX,
+          y: touch.clientY,
+        };
+      }
+
+      function handleTouchStart(event) {
+        var touch = event.touches[0];
+
+        isRotating = true;
+        previousMousePosition = {
+          x: touch.clientX,
+          y: touch.clientY,
+        };
+      }
+
+      function handleTouchEnd(event) {
+        isRotating = false;
+      }
+
       document.addEventListener("mousemove", handleMouseMove);
       document.addEventListener("mousedown", handleMouseDown);
       document.addEventListener("mouseup", handleMouseUp);
+
+      document.addEventListener("touchmove", handleTouchMove);
+      document.addEventListener("touchstart", handleTouchStart);
+      document.addEventListener("touchend", handleTouchEnd);
 
       function toRadians(degrees) {
         return degrees * (Math.PI / 180);
@@ -178,6 +220,3 @@
     </script>
   </body>
 </html>
-
-
-
