@@ -30,6 +30,17 @@
         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
       }
 
+      .header {
+      position: absolute;
+      top: 90%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      font-size: 40px;
+      font-weight: bold;
+      color: white;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+
       @media (max-width: 768px) {
         /* Mobile Styles */
         #canvas {
@@ -46,12 +57,13 @@
   <body>
     <div id="title">Weird World</div>
     <div id="canvas"></div>
+    <div class="header">Unnatural History the GPT Realm. Coming Soon!</div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
       var scene = new THREE.Scene();
 
-      var sphereTexture = new THREE.TextureLoader().load("img/maps.jpg");
+      var sphereTexture = new THREE.TextureLoader().load("img/alienMap3.jpg");
       var sphere = new THREE.Mesh(
         new THREE.SphereGeometry(100, 128, 64),
         new THREE.MeshBasicMaterial({ map: sphereTexture })
@@ -217,6 +229,8 @@
       }
 
       animate();
+
+      
     </script>
   </body>
 </html>
