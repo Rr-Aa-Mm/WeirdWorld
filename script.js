@@ -1,47 +1,84 @@
-import { PerspectiveCamera, Scene, WebGLRenderer, SphereGeometry, TextureLoader, MeshBasicMaterial, Mesh } from 'https://threejs.org/build/three.module.js';
-import { OrbitControls } from 'https://threejs.org/examples/jsm/controls/OrbitControls.js';
+import * as THREE from "./node_modules/three/build/three.module.js";
 
-// Create a scene, camera, and renderer
-var scene = new Scene();
-var camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-var renderer = new WebGLRenderer();
+// Load the texture
+const textureLoader = new THREE.TextureLoader();
+const texture = textureLoader.load("./img/maps.jpg");
 
-// Get the sphere container
-var container = document.getElementById('sphere-container');
+var scene = new THREE.Scene();
 
-// Set the size of the renderer to match the size of the container
-renderer.setSize(container.clientWidth, container.clientHeight);
+var sphere = new THREE.Mesh(
+  new THREE.SphereGeometry(100, 128, 64),
+  new THREE.MeshBasicMaterial({ map: texture })
+);
 
-// Append the renderer to the sphere container
-container.appendChild(renderer.domElement);
+scene.add(sphere);
 
-// Create a sphere geometry
-var geometry = new SphereGeometry(1, 32, 32);
+var camera = new THREE.PerspectiveCamera(
+  75,
+  window.innerWidth / window.innerHeight,
+  1,
+  1000
+);
+camera.position.z = 300;
 
-// Load the image
-var textureLoader = new TextureLoader();
-textureLoader.load('./img/maps.jpg', function(texture) {
-    // Create a material with the image as its texture
-    var material = new MeshBasicMaterial({ map: texture });
+var renderer = new THREE.WebGLRenderer();
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
 
-    // Create a mesh with the sphere geometry and image material
-    var sphere = new Mesh(geometry, material);
+var isRotating = false;
+var previousMousePosition = {
+  x: 0,
+  y: 0,
+};
 
-    // Add the sphere to the scene
-    scene.add(sphere);
+function handleMouseMove(event) {
+  var deltaMove = {
+    x: event.clientX - previousMousePosition.x,
+    y: event.clientY - previousMousePosition.y,
+  };
 
-    // Position the camera
-    camera.position.z = 2;
+  if (isRotating) {
+    var rotationQuaternion = new THREE.Quaternion().setFromEuler(
+      new THREE.Euler(
+        toRadians(deltaMove.y),
+        toRadians(deltaMove.x),
+        0,
+        "XYZ"
+      )
+    );
+    sphere.quaternion.multiplyQuaternions(rotationQuaternion, sphere.quaternion);
+  }
 
-    // Add controls to allow the user to rotate the sphere
-    var controls = new OrbitControls(camera, renderer.domElement);
+  previousMousePosition = {
+    x: event.clientX,
+    y: event.clientY,
+  };
+}
 
-    // Render the scene
-    var animate = function() {
-        requestAnimationFrame(animate);
-        controls.update();
-        renderer.render(scene, camera);
-    };
+function handleMouseDown(event) {
+  isRotating = true;
+  previousMousePosition = {
+    x: event.clientX,
+    y: event.clientY,
+  };
+}
 
-    animate();
-});
+function handleMouseUp(event) {
+  isRotating = false;
+}
+
+document.addEventListener("mousemove", handleMouseMove);
+document.addEventListener("mousedown", handleMouseDown);
+document.addEventListener("mouseup", handleMouseUp);
+
+function toRadians(degrees) {
+  return degrees * (Math.PI / 180);
+}
+
+var animate = function () {
+  requestAnimationFrame(animate);
+
+  renderer.render(scene, camera);
+};
+
+animate();

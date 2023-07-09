@@ -1,29 +1,183 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<html>
+  <head>
     <title>Weird World</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <div class="content-wrapper">
-        <header>
-            <h1 class="title">Weird World</h1>
-        </header>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+        background: url("img/BigGalaxy_square.jpg") no-repeat center center fixed;
+        background-size: cover;
+      }
 
-        <div id="sphere-container"></div>
+      #canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
 
-        <div class="grid-container">
-            <!-- 25 divs for the 5x5 grid -->
-            <div></div><div></div><div></div><div></div><div></div>
-            <div></div><div></div><div></div><div></div><div></div>
-            <div></div><div></div><div></div><div></div><div></div>
-            <div></div><div></div><div></div><div></div><div></div>
-            <div></div><div></div><div></div><div></div><div></div>
-        </div>
-    </div>
+      #title {
+        position: fixed;
+        top: 50px;
+        left: 0;
+        width: 100%;
+        text-align: center;
+        font-family: 'Nosifer', cursive;
+        font-size: 48px;
+        color: #fff;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      }
 
-    <script type="module" src="script.js"></script>
-</body>
+      @font-face {
+        font-family: 'Halloween Font';
+        src: url('fonts/halloween-font.ttf');
+      }
+
+      @media (max-width: 768px) {
+        /* Mobile Styles */
+        #canvas {
+          position: relative;
+          height: calc(100vh - 50px);
+        }
+      }
+    </style>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Nosifer&display=swap"
+        rel="stylesheet"
+      >
+  </head>
+  <body>
+    <div id="title">Weird World</div>
+    <div id="canvas"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+      var scene = new THREE.Scene();
+
+      var sphereTexture = new THREE.TextureLoader().load("img/maps.jpg");
+      var sphere = new THREE.Mesh(
+        new THREE.SphereGeometry(100, 128, 64),
+        new THREE.MeshBasicMaterial({ map: sphereTexture })
+      );
+
+      // Tip the central axis to the left
+      var axisTilt = 30; // Degrees
+      var axisQuaternion = new THREE.Quaternion().setFromAxisAngle(
+        new THREE.Vector3(1, 0, 0),
+        toRadians(axisTilt)
+      );
+      sphere.quaternion.premultiply(axisQuaternion);
+
+      scene.add(sphere);
+
+      var camera = new THREE.PerspectiveCamera(
+        75,
+        window.innerWidth / window.innerHeight,
+        1,
+        1000
+      );
+      camera.position.z = 300;
+
+      var renderer = new THREE.WebGLRenderer({ alpha: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.getElementById("canvas").appendChild(renderer.domElement);
+
+      var isRotating = false;
+      var previousMousePosition = {
+        x: 0,
+        y: 0,
+      };
+
+      function handleMouseMove(event) {
+        var deltaMove = {
+          x: event.clientX - previousMousePosition.x,
+          y: event.clientY - previousMousePosition.y,
+        };
+
+        if (isRotating) {
+          var rotationQuaternion = new THREE.Quaternion().setFromEuler(
+            new THREE.Euler(
+              toRadians(deltaMove.y),
+              toRadians(deltaMove.x),
+              0,
+              "XYZ"
+            )
+          );
+          sphere.quaternion.multiplyQuaternions(
+            rotationQuaternion,
+            sphere.quaternion
+          );
+        }
+
+        previousMousePosition = {
+          x: event.clientX,
+          y: event.clientY,
+        };
+      }
+
+      function handleMouseDown(event) {
+        isRotating = true;
+        previousMousePosition = {
+          x: event.clientX,
+          y: event.clientY,
+        };
+      }
+
+      function handleMouseUp(event) {
+        isRotating = false;
+      }
+
+      document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("mousedown", handleMouseDown);
+      document.addEventListener("mouseup", handleMouseUp);
+
+      function toRadians(degrees) {
+        return degrees * (Math.PI / 180);
+      }
+
+      function handleMouseWheel(event) {
+        event.preventDefault();
+
+        var delta = Math.max(-1, Math.min(1, event.wheelDelta || -event.detail));
+        var zoomSpeed = 20.0; // Increase the zoom speed
+
+        if (delta < 0) {
+          camera.position.z += zoomSpeed;
+        } else {
+          camera.position.z -= zoomSpeed;
+        }
+      }
+
+      document.addEventListener("mousewheel", handleMouseWheel);
+      document.addEventListener("DOMMouseScroll", handleMouseWheel);
+
+      // Initial rotation animation
+      var rotationSpeed = 0.005;
+      var autoRotate = true;
+
+      function rotateSphere() {
+        if (autoRotate) {
+          sphere.rotation.y += rotationSpeed;
+        }
+      }
+
+      function stopRotation() {
+        autoRotate = false;
+      }
+
+      function animate() {
+        requestAnimationFrame(animate);
+
+        rotateSphere();
+        renderer.render(scene, camera);
+      }
+
+      animate();
+    </script>
+  </body>
 </html>
+
+
+
