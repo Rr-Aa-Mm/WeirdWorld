@@ -1,6 +1,9 @@
 var scene = new THREE.Scene();
 
-var sphereTexture = new THREE.TextureLoader().load("img/maps.jpg");
+var imagePaths = ["img/alienMap4.jpg", "img/alienMap1.png", "img/alienMap2.png", "img/alienMap3.jpg" ]; // Add your image paths here
+var currentImageIndex = 0;
+
+var sphereTexture = new THREE.TextureLoader().load(imagePaths[currentImageIndex]);
 var sphere = new THREE.Mesh(
   new THREE.SphereGeometry(100, 128, 64),
   new THREE.MeshBasicMaterial({ map: sphereTexture })
@@ -166,3 +169,13 @@ function animate() {
 }
 
 animate();
+
+function updateTexture() {
+  sphere.material.map = new THREE.TextureLoader().load(imagePaths[currentImageIndex]);
+  sphere.material.needsUpdate = true;
+  currentImageIndex = (currentImageIndex + 1) % imagePaths.length;
+}
+
+setInterval(updateTexture, 2000); // Change texture every 2 seconds
+
+// ... rest of your code ...
